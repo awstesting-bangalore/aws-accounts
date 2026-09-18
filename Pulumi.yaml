@@ -1,0 +1,15 @@
+name: aws-accounts 
+description: New AWS Accounts creation via Pulumi 
+organization: aenetworks-gto 
+
+runtime: 
+  name: nodejs 
+  options: packagemanager: npm 
+  
+config: 
+  pulumi:tags: 
+    value: "pulumi:template": aws-typescript 
+    
+packages: 
+create-newaccount: https://github.com/awstesting-bangalore/create_account.git/IAC/create_newaccount@a23f1ec5fbdb5fdac9c9779bc46bb8b111f809c4
+#bootstrap-newaccount: https://github.com/awstesting-bangalore/create_account.git/IAC/create_newaccount@d63f5d6d09bfc0f3eebb9e0e56b12769448cceb2
