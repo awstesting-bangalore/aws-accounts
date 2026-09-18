@@ -1,7 +1,6 @@
 name: aws-accounts 
 description: New AWS Accounts creation via Pulumi 
-organization: aenetworks-gto 
-
+organization: awstesting-bangalore
 runtime: 
   name: nodejs 
   options: packagemanager: npm 
