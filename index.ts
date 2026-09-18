@@ -1,7 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 
-import { CreateNewAccount } from "@awstesting-bangalore/create_account";
+import { CreateNewAccount } from "@awstesting-bangalore/create-newaccount";
 //import { BootstrapNewAccount } from "@aenetworks-gto/bootstrap-newaccount";
 
 
