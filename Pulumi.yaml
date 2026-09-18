@@ -3,7 +3,8 @@ description: New AWS Accounts creation via Pulumi
 organization: awstesting-bangalore
 runtime: 
   name: nodejs 
-  options: packagemanager: npm 
+  options: 
+    packagemanager: npm 
   
 config: 
   pulumi:tags: 
