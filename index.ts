@@ -2,7 +2,10 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 
 import { CreateNewAccount } from "@awstesting-bangalore/create-newaccount";
-//import { BootstrapNewAccount } from "@aenetworks-gto/bootstrap-newaccount";
+// Stages 2-5 (bootstrap_newaccount, provision_iamroles, deploy_vpc,
+// configure_cloudlogging) do not have provider packages implemented yet.
+// Their imports and instantiation are intentionally omitted below; the
+// corresponding stages fail fast with a clear error until they are built.
 
 
 const config =
@@ -277,65 +280,15 @@ if (
 // target account's OrganizationAccountAccessRole.
 // -----------------------------------------------------------------------------
 
-let bootstrapNewAccount:
-    BootstrapNewAccount |
-    undefined;
-
-let bootstrapAccountId:
-    string |
-    undefined;
-
-let bootstrapAccountName:
-    string |
-    undefined;
-
-let bootstrapAccountAlias:
-    string |
-    undefined;
-
 if (
     includesStage(
         "bootstrap_newaccount",
     )
 ) {
-    bootstrapAccountId =
-        config.require(
-            "bootstrapAccountId",
-        );
-
-    bootstrapAccountName =
-        config.require(
-            "bootstrapAccountName",
-        );
-
-    bootstrapAccountAlias =
-        config.get(
-            "bootstrapAccountAlias",
-        ) ??
-        bootstrapAccountName;
-
-    bootstrapNewAccount =
-        new BootstrapNewAccount(
-            "bootstrap-newaccount",
-            {
-                accountId:
-                    bootstrapAccountId,
-
-                accountName:
-                    bootstrapAccountName,
-
-                accountAlias:
-                    bootstrapAccountAlias,
-            },
-            {
-                dependsOn:
-                    createNewAccount
-                        ? [
-                              createNewAccount,
-                          ]
-                        : [],
-            },
-        );
+    throw new Error(
+        "Stage 2 (bootstrap_newaccount) is not implemented yet: " +
+        "no BootstrapNewAccount provider package exists.",
+    );
 }
 
 
@@ -343,156 +296,21 @@ if (
 // Stage 3 - Target-account IAM Roles
 // -----------------------------------------------------------------------------
 
-let provisionIamRoles:
-    ProvisionIamRoles |
-    undefined;
-
-let iamRolesAccountId:
-    string |
-    undefined;
-
-let iamDepartment:
-    string |
-    undefined;
-
 if (
     includesStage(
         "provision_iamroles",
     )
 ) {
-    iamRolesAccountId =
-        config.require(
-            "iamRolesAccountId",
-        );
-
-    const iamIdentityAccountId =
-        config.require(
-            "IdentityAccountId",
-        );
-
-    const iamOrgAccountId =
-        config.require(
-            "OrgAccountId",
-        );
-
-    iamDepartment =
-        config.require(
-            "Department",
-        );
-
-    const iamStaticTags =
-        config.getObject<
-            Record<string, string>
-        >(
-            "iamStaticTags",
-        ) ??
-        config.getObject<
-            Record<string, string>
-        >(
-            "staticTags",
-        ) ??
-        {};
-
-    const restoreOrganizationAccountAccessRoleTrust =
-        config.getBoolean(
-            "iamRestoreOrganizationAccountAccessRoleTrust",
-        ) ??
-        true;
-
-    const temporaryTrustPrincipalArn =
-        config.get(
-            "iamTemporaryTrustPrincipalArn",
-        );
-
-    const permanentTargetRoleArn =
-        config.require(
-            "iamPermanentTargetRoleArn",
-        );
-
-    const targetRoleArn =
-        config.get(
-            "iamTargetRoleArn",
-        );
-
-    const organizationAccountAccessRoleName =
-        config.get(
-            "iamOrganizationAccountAccessRoleName",
-        ) ??
-        "OrganizationAccountAccessRole";
-
-    provisionIamRoles =
-        new ProvisionIamRoles(
-            "provision-iamroles",
-            {
-                accountId:
-                    iamRolesAccountId,
-
-                department:
-                    iamDepartment,
-
-                identityAccountId:
-                    iamIdentityAccountId,
-
-                orgAccountId:
-                    iamOrgAccountId,
-
-                staticTags:
-                    iamStaticTags,
-
-                targetRoleArn:
-                    targetRoleArn,
-
-                restoreOrganizationAccountAccessRoleTrust,
-
-                temporaryTrustPrincipalArn,
-
-                permanentTargetRoleArn,
-
-                organizationAccountAccessRoleName,
-            },
-            {
-                dependsOn:
-                    bootstrapNewAccount
-                        ? [
-                              bootstrapNewAccount,
-                          ]
-                        : [],
-            },
-        );
+    throw new Error(
+        "Stage 3 (provision_iamroles) is not implemented yet: " +
+        "no ProvisionIamRoles provider package exists.",
+    );
 }
 
 
 // -----------------------------------------------------------------------------
 // Stage 4 - Deploy VPC
 // -----------------------------------------------------------------------------
-
-let deployVpc:
-    DeployVpc |
-    undefined;
-
-let vpcAccountId:
-    string |
-    undefined;
-
-let vpcAccountName:
-    string |
-    undefined;
-
-let vpcAccountAlias:
-    string |
-    undefined;
-
-let vpcRegion:
-    string |
-    undefined;
-
-let vpcEnvironment:
-    string |
-    undefined;
-
-let vpcCidr:
-    string |
-    undefined;
 
 const vpcRequired =
     config.getBoolean(
@@ -506,139 +324,10 @@ if (
     ) &&
     vpcRequired
 ) {
-    vpcAccountId =
-        config.require(
-            "AccountId",
-        );
-
-    vpcAccountName =
-        config.require(
-            "AccountName",
-        );
-
-    vpcAccountAlias =
-        config.get(
-            "AccountAlias",
-        ) ??
-        vpcAccountName;
-
-    vpcEnvironment =
-        config.require(
-            "Environment",
-        );
-
-    vpcRegion =
-        config.require(
-            "vpcRegion",
-        );
-
-    vpcCidr =
-        config.require(
-            "vpcCidr",
-        );
-
-    const vpcRegionPrefix =
-        config.get(
-            "vpcRegionPrefix",
-        );
-
-    const vpcConfig =
-        config.requireObject<{
-            min: number;
-            max: number;
-            enableDnsSupport: boolean;
-            enableDnsHostnames: boolean;
-        }>(
-            "vpc",
-        );
-
-    const dhcpOptionsSet =
-        config.requireObject<{
-            domainName: string;
-            domainNameServers: string[];
-        }>(
-            "dhcp_options_set",
-        );
-
-    const vpcStaticTags =
-        config.getObject<
-            Record<string, string>
-        >(
-            "vpcStaticTags",
-        ) ??
-        config.getObject<
-            Record<string, string>
-        >(
-            "staticTags",
-        ) ??
-        {};
-
-    const regionPrefixMap =
-        config.getObject<
-            Record<string, string>
-        >(
-            "regionPrefixMap",
-        );
-
-    deployVpc =
-        new DeployVpc(
-            "deploy-vpc",
-            {
-                accountId:
-                    vpcAccountId,
-
-                accountName:
-                    vpcAccountName,
-
-                accountAlias:
-                    vpcAccountAlias,
-
-                region:
-                    vpcRegion,
-
-                environment:
-                    vpcEnvironment,
-
-                vpcCidr:
-                    vpcCidr,
-
-                regionPrefix:
-                    vpcRegionPrefix,
-
-                vpcNumber:
-                    vpcConfig.min,
-
-                enableDnsSupport:
-                    vpcConfig.enableDnsSupport,
-
-                enableDnsHostnames:
-                    vpcConfig.enableDnsHostnames,
-
-                domainName:
-                    dhcpOptionsSet.domainName,
-
-                domainNameServers:
-                    dhcpOptionsSet.domainNameServers,
-
-                staticTags:
-                    vpcStaticTags,
-
-                regionPrefixMap:
-                    regionPrefixMap,
-            },
-            {
-                dependsOn:
-                    provisionIamRoles
-                        ? [
-                              provisionIamRoles,
-                          ]
-                        : bootstrapNewAccount
-                          ? [
-                                bootstrapNewAccount,
-                            ]
-                          : [],
-            },
-        );
+    throw new Error(
+        "Stage 4 (deploy_vpc) is not implemented yet: " +
+        "no DeployVpc provider package exists.",
+    );
 }
 
 
@@ -646,109 +335,15 @@ if (
 // Stage 5 - Configure Cloud Logging
 // -----------------------------------------------------------------------------
 
-let configureCloudLogging:
-    ConfigureCloudLogging |
-    undefined;
-
-let cloudLoggingAccountId:
-    string |
-    undefined;
-
-let cloudLoggingAccountName:
-    string |
-    undefined;
-
 if (
     includesStage(
         "configure_cloudlogging",
     )
 ) {
-    cloudLoggingAccountId =
-        config.require(
-            "AccountId",
-        );
-
-    cloudLoggingAccountName =
-        config.require(
-            "AccountName",
-        );
-
-    const cloudLoggingAccountAlias =
-        config.get(
-            "AccountAlias",
-        ) ??
-        cloudLoggingAccountName;
-
-    const cloudLoggingRegion =
-        config.require(
-            "cloudLoggingRegion",
-        );
-
-    const cloudLoggingRegionPrefix =
-        config.get(
-            "cloudLoggingRegionPrefix",
-        );
-
-    const cloudLoggingEnvironment =
-        config.require(
-            "Environment",
-        );
-
-    const cloudLoggingStaticTags =
-        config.getObject<
-            Record<string, string>
-        >(
-            "cloudLoggingStaticTags",
-        ) ??
-        config.getObject<
-            Record<string, string>
-        >(
-            "staticTags",
-        ) ??
-        {};
-
-    configureCloudLogging =
-        new ConfigureCloudLogging(
-            "configure-cloudlogging",
-            {
-                accountId:
-                    cloudLoggingAccountId,
-
-                accountName:
-                    cloudLoggingAccountName,
-
-                accountAlias:
-                    cloudLoggingAccountAlias,
-
-                region:
-                    cloudLoggingRegion,
-
-                environment:
-                    cloudLoggingEnvironment,
-
-                regionPrefix:
-                    cloudLoggingRegionPrefix,
-
-                staticTags:
-                    cloudLoggingStaticTags,
-            },
-            {
-                dependsOn:
-                    deployVpc
-                        ? [
-                              deployVpc,
-                          ]
-                        : provisionIamRoles
-                          ? [
-                                provisionIamRoles,
-                            ]
-                          : bootstrapNewAccount
-                            ? [
-                                  bootstrapNewAccount,
-                              ]
-                            : [],
-            },
-        );
+    throw new Error(
+        "Stage 5 (configure_cloudlogging) is not implemented yet: " +
+        "no ConfigureCloudLogging provider package exists.",
+    );
 }
 
 
@@ -791,168 +386,40 @@ export const stage1_create_newaccount =
                   "not_enabled",
           };
 
+// Stages 2-5 have no provider package implemented yet (see the stage guards
+// above, which fail fast if one of these stages is actually requested), so
+// their outputs are always "not_enabled" for now.
 export const stage2_bootstrap_newaccount =
-    bootstrapNewAccount
-        ? {
-              account_id:
-                  bootstrapNewAccount.accountId,
-
-              account_name:
-                  bootstrapNewAccount.accountName,
-
-              account_alias:
-                  bootstrapNewAccount.accountAlias,
-
-              actions_taken:
-                  bootstrapNewAccount.actionsTaken,
-
-              warnings:
-                  bootstrapNewAccount.warnings,
-
-              dry_run:
-                  bootstrapNewAccount.dryRun,
-          }
-        : {
-              status:
-                  "not_enabled",
-          };
+    {
+        status:
+            "not_enabled",
+    };
 
 export const stage3_iam_roles =
-    provisionIamRoles
-        ? {
-              account_id:
-                  iamRolesAccountId,
-
-              department:
-                  iamDepartment,
-
-              role_names:
-                  provisionIamRoles.roleNames,
-
-              trust_restore_status:
-                  provisionIamRoles.restoreTrustStatus,
-          }
-        : {
-              status:
-                  "not_enabled",
-          };
+    {
+        status:
+            "not_enabled",
+    };
 
 export const stage4_deploy_vpc =
-    deployVpc
+    includesStage(
+        "deploy_vpc",
+    ) &&
+    !vpcRequired
         ? {
-              account_id:
-                  vpcAccountId,
-
-              account_name:
-                  vpcAccountName,
-
-              account_alias:
-                  vpcAccountAlias,
-
-              region:
-                  vpcRegion,
-
-              environment:
-                  vpcEnvironment,
-
-              vpc_cidr:
-                  vpcCidr,
-
-              vpc_name:
-                  deployVpc.vpcName,
-
-              vpc_id:
-                  deployVpc.vpcId,
-
-              igw_name:
-                  deployVpc.igwName,
-
-              igw_id:
-                  deployVpc.igwId,
-
-              dos_name:
-                  deployVpc.dosName,
-
-              dos_id:
-                  deployVpc.dosId,
-
-              public_route_table_name:
-                  deployVpc.publicRouteTableName,
-
-              public_route_table_id:
-                  deployVpc.publicRouteTableId,
-
-              private_route_table_name:
-                  deployVpc.privateRouteTableName,
-
-              private_route_table_id:
-                  deployVpc.privateRouteTableId,
-
-              subnet_count:
-                  deployVpc.subnetCount,
-
-              subnets:
-                  deployVpc.subnets,
-
-              common_tags:
-                  deployVpc.commonTags,
-
-              resource_tags:
-                  deployVpc.resourceTags,
-          }
-        : includesStage(
-              "deploy_vpc",
-          ) &&
-          !vpcRequired
-          ? {
-                status:
-                    "not_required",
-            }
-          : {
-                status:
-                    "not_enabled",
-            };
-
-export const stage5_cloud_logging =
-    configureCloudLogging
-        ? {
-              account_id:
-                  configureCloudLogging.accountId,
-
-              account_name:
-                  configureCloudLogging.accountName,
-
-              region:
-                  configureCloudLogging.region,
-
-              region_prefix:
-                  configureCloudLogging.regionPrefix,
-
-              cloudtrail_names:
-                  configureCloudLogging.cloudTrailNames,
-
-              cloudtrail_arns:
-                  configureCloudLogging.cloudTrailArns,
-
-              cloudwatch_log_group_names:
-                  configureCloudLogging.cloudWatchLogGroupNames,
-
-              cloudwatch_log_group_arns:
-                  configureCloudLogging.cloudWatchLogGroupArns,
-
-              kms_key_arn:
-                  configureCloudLogging.kmsKeyArn,
-
-              kms_alias:
-                  configureCloudLogging.kmsKeyAlias,
-
-              cloudtrail_cloudwatch_role_arn:
-                  configureCloudLogging.cloudTrailCloudWatchLogsRoleArn,
+              status:
+                  "not_required",
           }
         : {
               status:
                   "not_enabled",
           };
+
+export const stage5_cloud_logging =
+    {
+        status:
+            "not_enabled",
+    };
 
 export const deployment_stage =
     deployStage;
