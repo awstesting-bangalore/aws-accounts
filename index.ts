@@ -273,7 +273,16 @@ if (
 
                 checkAliases:
                     checkAliases,
+                
+                checkAccountNames:
+                    checkAccountNames,
 
+                allowedPrefix:
+                    allowedPrefix,
+
+                forbiddenPrefixes:
+                    forbiddenPrefixes,
+                
                 managedAccountId:
                     managedAccountId,
 
