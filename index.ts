@@ -2,10 +2,11 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 
 import { CreateNewAccount } from "@awstesting-bangalore/create-newaccount";
-// Stages 2-5 (bootstrap_newaccount, provision_iamroles, deploy_vpc,
-// configure_cloudlogging) do not have provider packages implemented yet.
-// Their imports and instantiation are intentionally omitted below; the
-// corresponding stages fail fast with a clear error until they are built.
+import { BootstrapNewAccount } from "@awstesting-bangalore/bootstrap-newaccount";
+// Stages 3-5 (provision_iamroles, deploy_vpc, configure_cloudlogging) do not
+// have provider packages implemented yet. Their imports and instantiation
+// are intentionally omitted below; the corresponding stages fail fast with
+// a clear error until they are built.
 
 
 const config =
@@ -187,6 +188,10 @@ let managedAccountId:
     string |
     undefined;
 
+let bootstrapNewAccount:
+    BootstrapNewAccount |
+    undefined;
+
 if (
     includesStage(
         "create_newaccount",
@@ -276,8 +281,11 @@ if (
 // Stage 2 - Bootstrap New Account
 // -----------------------------------------------------------------------------
 //
-// Stage 2 uses the default AWS provider from ESC, which should assume the
-// target account's OrganizationAccountAccessRole.
+// Stage 2 targets the member account directly, via an explicit provider that
+// assumes OrganizationAccountAccessRole in that account. The target account
+// id/name/alias are supplied explicitly (mirroring managedAccountId in Stage
+// 1) rather than derived from the Stage 1 resource, since Stage 2 can also
+// run as part of a later, IAM-only reconciliation pass.
 // -----------------------------------------------------------------------------
 
 if (
@@ -285,10 +293,60 @@ if (
         "bootstrap_newaccount",
     )
 ) {
-    throw new Error(
-        "Stage 2 (bootstrap_newaccount) is not implemented yet: " +
-        "no BootstrapNewAccount provider package exists.",
-    );
+    const bootstrapAccountId =
+        config.require(
+            "bootstrapAccountId",
+        );
+
+    const bootstrapAccountName =
+        config.get(
+            "bootstrapAccountName",
+        );
+
+    const bootstrapAccountAlias =
+        config.get(
+            "bootstrapAccountAlias",
+        );
+
+    const targetAccountProvider =
+        new aws.Provider(
+            "target-account",
+            {
+                region:
+                    "us-east-1",
+
+                assumeRoles: [
+                    {
+                        roleArn:
+                            pulumi.interpolate`arn:aws:iam::${bootstrapAccountId}:role/OrganizationAccountAccessRole`,
+
+                        sessionName:
+                            "pulumi-bootstrap-newaccount",
+                    },
+                ],
+            },
+        );
+
+    bootstrapNewAccount =
+        new BootstrapNewAccount(
+            "bootstrap-newaccount",
+            {
+                accountId:
+                    bootstrapAccountId,
+
+                accountName:
+                    bootstrapAccountName,
+
+                accountAlias:
+                    bootstrapAccountAlias,
+            },
+            {
+                providers: {
+                    aws:
+                        targetAccountProvider,
+                },
+            },
+        );
 }
 
 
@@ -386,15 +444,35 @@ export const stage1_create_newaccount =
                   "not_enabled",
           };
 
-// Stages 2-5 have no provider package implemented yet (see the stage guards
+export const stage2_bootstrap_newaccount =
+    bootstrapNewAccount
+        ? {
+              account_id:
+                  bootstrapNewAccount.accountId,
+
+              account_name:
+                  bootstrapNewAccount.accountName,
+
+              account_alias:
+                  bootstrapNewAccount.accountAlias,
+
+              actions_taken:
+                  bootstrapNewAccount.actionsTaken,
+
+              warnings:
+                  bootstrapNewAccount.warnings,
+
+              dry_run:
+                  bootstrapNewAccount.dryRun,
+          }
+        : {
+              status:
+                  "not_enabled",
+          };
+
+// Stages 3-5 have no provider package implemented yet (see the stage guards
 // above, which fail fast if one of these stages is actually requested), so
 // their outputs are always "not_enabled" for now.
-export const stage2_bootstrap_newaccount =
-    {
-        status:
-            "not_enabled",
-    };
-
 export const stage3_iam_roles =
     {
         status:
