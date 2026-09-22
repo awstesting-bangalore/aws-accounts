@@ -229,6 +229,16 @@ if (
             "managementAccountRoleArn",
         );
 
+    const managementBootstrapRoleArn =
+        config.require(
+            "managementBootstrapRoleArn",
+        );
+
+    const memberAccountRoleName =
+        config.require(
+            "memberAccountRoleName",
+        );
+
     const managementProvider =
         new aws.Provider(
             "management-account",
@@ -266,6 +276,15 @@ if (
 
                 managedAccountId:
                     managedAccountId,
+
+                managementAccountRoleArn:
+                    managementAccountRoleArn,
+
+                managementBootstrapRoleArn:
+                    managementBootstrapRoleArn,
+
+                memberAccountRoleName:
+                    memberAccountRoleName,
             },
             {
                 providers: {
@@ -435,9 +454,6 @@ export const stage1_create_newaccount =
 
               duplicate:
                   createNewAccount.duplicate,
-
-              dry_run:
-                  createNewAccount.dryRun,
           }
         : {
               status:
