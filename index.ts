@@ -218,7 +218,23 @@ if (
             "checkAliases",
         ) ??
         true;
+    
+    const checkAccountNames =
+        config.getBoolean(
+            "checkAccountNames",
+        ) ??
+        true;
 
+    const allowedPrefix =
+        config.get(
+            "allowedPrefix",
+        );
+
+    const forbiddenPrefixes =
+        config.getObject<string[]>(
+            "forbiddenPrefixes",
+        );
+    
     managedAccountId =
         config.get(
             "managedAccountId",
