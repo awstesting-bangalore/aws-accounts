@@ -213,27 +213,12 @@ if (
         ) ??
         createAccountName;
 
-    const checkAliases =
-        config.getBoolean(
-            "checkAliases",
-        ) ??
-        true;
-    
-    const checkAccountNames =
-        config.getBoolean(
-            "checkAccountNames",
-        ) ??
-        true;
+    const checkAliases = config.getBoolean("checkAliases");
+    const checkAccountNames = config.getBoolean("checkAccountNames");
 
-    const allowedPrefix =
-        config.get(
-            "allowedPrefix",
-        );
+    const allowedPrefix = config.require("allowedPrefix");
 
-    const forbiddenPrefixes =
-        config.getObject<string[]>(
-            "forbiddenPrefixes",
-        );
+    const forbiddenPrefixes = config.requireObject<string[]>("forbiddenPrefixes");
     
     managedAccountId =
         config.get(
@@ -473,6 +458,9 @@ export const stage1_create_newaccount =
 
               account_id:
                   createNewAccount.accountId,
+              
+              account_joined_timestamp: 
+                  createNewAccount.accountJoinedTimestamp,    
 
               reason:
                   createNewAccount.reason,
