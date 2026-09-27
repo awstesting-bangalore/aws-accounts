@@ -12,5 +12,5 @@ config:
       "pulumi:template": aws-typescript 
     
 packages:
-  create-newaccount: https://github.com/awstesting-bangalore/create_account.git/IAC/create_newaccount@379991828dda000acbc0f4741e3300c086ef1233
+  create-newaccount: https://github.com/awstesting-bangalore/create_account.git/IAC/create_newaccount@eabc07a4cc65d130a8ca4c93ed303a47893daf70
   bootstrap-newaccount: https://github.com/awstesting-bangalore/bootstrap_account.git/IAC/bootstrap_newaccount@664d792427465591480e7df71ee44d2f62989c7d
