@@ -490,9 +490,6 @@ export const stage2_bootstrap_newaccount =
 
               warnings:
                   bootstrapNewAccount.warnings,
-
-              dry_run:
-                  bootstrapNewAccount.dryRun,
           }
         : {
               status:
